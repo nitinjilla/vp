@@ -1,0 +1,36 @@
+# 3-NODE CLUSTER
+
+Vagrant.configure("2") do |config|
+
+  config.vm.provision "shell", inline: <<-EOL
+  echo "Setting up your Foreman sandbox."
+  EOL
+
+  config.vm.box = "centos/8"
+  config.vbguest.auto_update = false
+  #config.vbguest.auto_update = true
+
+  # PROVISION NODES AS PER YOUR REQUIREMENT
+  WN_COUNT = 3  
+  (1..WN_COUNT).each do |i|
+    config.vm.define "vm-#{i}" do |no|
+      no.vm.provision "shell", inline: <<-EOL 
+      echo "Provisioning vm-#{i}..."
+      EOL
+
+      no.vm.hostname = "vm-#{i}"
+      
+      no.vm.network "private_network", ip: "192.168.10.#{10+i}"
+
+      # VIRTUAL BOX RESOURCE LIMITS FOR WORKER NODE
+      no.vm.provider "virtualbox" do |vb|
+        vb.cpus = 1
+
+        vb.memory = 1024
+      end
+
+    end 
+
+  end 
+
+end
